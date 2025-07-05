@@ -13,9 +13,11 @@ const userSchema = new mongoose.Schema(
     },
     location: { type: String },
     phone: { type: String },
+    interestedCrops: [{ type: String }], 
   },
   { timestamps: true }
 );
+
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();

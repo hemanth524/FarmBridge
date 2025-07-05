@@ -3,7 +3,7 @@ import cloudinary from "../config/cloudinary.js";
 
 // Add Produce
 export const addProduce = async (req, res) => {
-  const { name, description, quantity, price, availabilityWindow, images: imageBase64Array } = req.body;
+  const { name, description, quantity, price, availabilityWindow, images: imageBase64Array, buyers } = req.body;
   try {
     const images = [];
 
@@ -24,6 +24,7 @@ export const addProduce = async (req, res) => {
       price,
       availabilityWindow,
       images,
+      buyers, // ✅ Save selected buyers
     });
 
     res.status(201).json(produce);
@@ -31,7 +32,6 @@ export const addProduce = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 // Get All Produce
 export const getAllProduce = async (req, res) => {

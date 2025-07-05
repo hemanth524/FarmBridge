@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function Register() {
     const { backendURL, setUser } = useContext(AuthContext);
@@ -31,9 +32,12 @@ export default function Register() {
             localStorage.setItem("token", token);
             const decoded = JSON.parse(atob(token.split(".")[1]));
             setUser({ ...decoded, token });
+            toast.success("Registration successful!");
             navigate("/");
         } catch (err) {
-            setError(err.response?.data?.message || "Registration failed.");
+            const msg = err.response?.data?.message || "Registration failed.";
+            setError(msg);
+            toast.error(msg);
         }
     };
 

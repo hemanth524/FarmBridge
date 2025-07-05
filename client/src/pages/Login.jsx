@@ -2,15 +2,12 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function Login() {
     const { backendURL, setUser } = useContext(AuthContext);
     const navigate = useNavigate();
-
-    const [formData, setFormData] = useState({
-        email: "",
-        password: ""
-    });
+    const [formData, setFormData] = useState({ email: "", password: "" });
     const [error, setError] = useState("");
 
     const handleChange = (e) => {
@@ -26,9 +23,12 @@ export default function Login() {
             localStorage.setItem("token", token);
             const decoded = JSON.parse(atob(token.split(".")[1]));
             setUser({ ...decoded, token });
+            toast.success("Login successful!");
             navigate("/");
         } catch (err) {
-            setError(err.response?.data?.message || "Login failed.");
+            const msg = err.response?.data?.message || "Login failed.";
+            setError(msg);
+            toast.error(msg);
         }
     };
 

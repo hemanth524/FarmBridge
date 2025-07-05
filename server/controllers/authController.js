@@ -62,3 +62,13 @@ export const loginUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getAllUsers = async (req, res) => {
+  try {
+    let roleToFetch = req.user.role === "buyer" ? "farmer" : "buyer";
+    const users = await User.find({ role: roleToFetch }).select("_id name role email phone location");
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

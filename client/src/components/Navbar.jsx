@@ -10,6 +10,16 @@ export default function Navbar() {
             <Link to="/" className="text-xl font-bold">
                 FarmBridge 🚜
             </Link>
+                         {user?.role === "farmer" && (
+    <Link to="/add-produce" className="hover:underline">Add Produce</Link>
+)}
+<Link to="/my-produce" className="hover:underline">My Produce</Link>
+{user && (
+    <Link to="/chat" className="hover:underline">Chat</Link>
+)}
+{user?.role === "buyer" && (
+    <Link to="/browse-produce" className="hover:underline">Browse Produce</Link>
+)}
             <div className="flex gap-4 items-center">
                 {user ? (
                     <>
@@ -27,6 +37,7 @@ export default function Navbar() {
                         <Link to="/login" className="hover:underline">Login</Link>
                     </>
                 )}
+   
             </div>
         </nav>
     );
