@@ -15,7 +15,8 @@ export const AuthProvider = ({ children }) => {
         if (token) {
             try {
                 const decoded = jwtDecode(token);
-                setUser({ ...decoded, token });
+                console.log(decoded);
+                setUser({ _id: decoded.id,...decoded, token });
             } catch (error) {
                 console.error("Invalid token, clearing.");
                 localStorage.removeItem("token");

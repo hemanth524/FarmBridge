@@ -20,6 +20,7 @@ export default function Navbar() {
 {user?.role === "buyer" && (
     <Link to="/browse-produce" className="hover:underline">Browse Produce</Link>
 )}
+<Link to="/bidding-sessions">My Bids</Link> 
             <div className="flex gap-4 items-center">
                 {user ? (
                     <>

@@ -7,10 +7,11 @@ import MyProduce from "./pages/MyProduce";
 import { Toaster } from 'react-hot-toast';
 import BuyerBrowseProduce from "./pages/BuyerBrowseProduce";
 import ChatPage from "./pages/ChatPage";
+import BiddingRoom from "./pages/BiddingRoom";
+import BiddingSessions from "./pages/BiddingSessions";
 function App() {
     return (
             <div>
-            <Toaster position="top-right"  />
             <Navbar />
             <Routes>
                 <Route path="/" element={
@@ -24,8 +25,11 @@ function App() {
                 <Route path="/my-produce" element={<MyProduce />} />
                 <Route path="/browse-produce" element={<BuyerBrowseProduce/>}/>
                 <Route path="/chat" element={<ChatPage />} />
-
+                <Route path="/bidding/:bidSessionId" element={<BiddingRoom />} />
+                <Route path="/bidding-sessions" element={<BiddingSessions />} />
             </Routes>
+            
+            <Toaster position="top-right"  />
             </div>
        
     );
