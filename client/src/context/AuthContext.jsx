@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
-
+import axios from "axios";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -10,21 +10,41 @@ export const AuthProvider = ({ children }) => {
     // ✅ Backend URL managed here
     const backendURL = "http://localhost:5247/api";
 
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            try {
-                const decoded = jwtDecode(token);
-                console.log(decoded);
-                setUser({ _id: decoded.id,...decoded, token });
-            } catch (error) {
-                console.error("Invalid token, clearing.");
-                localStorage.removeItem("token");
-                setUser(null);
-            }
+   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        try {
+            const decoded = jwtDecode(token);
+            const fetchUser = async () => {
+                try {
+                    const res = await axios.get(`${backendURL}/auth/me`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+                    setUser({
+                        ...res.data,
+                        token,
+                    });
+                } catch (error) {
+                    console.error("Error fetching user:", error);
+                    localStorage.removeItem("token");
+                    setUser(null);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchUser();
+        } catch (error) {
+            console.error("Invalid token, clearing.");
+            localStorage.removeItem("token");
+            setUser(null);
+            setLoading(false);
         }
+    } else {
         setLoading(false);
-    }, []);
+    }
+}, []);
 
     const logout = () => {
         localStorage.removeItem("token");

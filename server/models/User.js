@@ -13,11 +13,15 @@ const userSchema = new mongoose.Schema(
     },
     location: { type: String },
     phone: { type: String },
-    interestedCrops: [{ type: String }], 
+    interestedCrops: [{ type: String }],
+    avatar: {
+    type: String, // will store image URL or path (e.g. /uploads/abc.jpg)
+    default: ''
+  },
+   
   },
   { timestamps: true }
 );
-
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();

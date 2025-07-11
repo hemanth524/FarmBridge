@@ -21,6 +21,22 @@ export default function Navbar() {
     <Link to="/browse-produce" className="hover:underline">Browse Produce</Link>
 )}
 <Link to="/bidding-sessions">My Bids</Link> 
+ <div className="flex items-center space-x-4">
+        {user && (
+          <Link to="/profile" className="hover:underline flex items-center space-x-2">
+            <img
+  src={
+    user.avatar ||
+    user.image || // fallback if some old accounts have `image`
+    "https://collection.cloudinary.com/...default.jpg"
+  }
+  alt="Profile"
+  className="w-8 h-8 rounded-full object-cover border"
+/>
+            <span>Profile</span>
+          </Link>
+        )}
+      </div>
             <div className="flex gap-4 items-center">
                 {user ? (
                     <>

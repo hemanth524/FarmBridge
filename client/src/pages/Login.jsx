@@ -21,10 +21,17 @@ export default function Login() {
             const response = await axios.post(`${backendURL}/auth/login`, formData);
             const { token } = response.data;
             localStorage.setItem("token", token);
-            const decoded = JSON.parse(atob(token.split(".")[1]));
-            setUser({ ...decoded, token });
-            toast.success("Login successful!");
-            navigate("/");
+            try {
+    const userRes = await axios.get(`${backendURL}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    setUser({ ...userRes.data, token });
+    toast.success("Login successful!");
+    navigate("/");
+} catch (fetchErr) {
+    console.error(fetchErr);
+    toast.error("Failed to fetch user data.");
+}
         } catch (err) {
             const msg = err.response?.data?.message || "Login failed.";
             setError(msg);

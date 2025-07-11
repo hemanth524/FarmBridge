@@ -9,6 +9,7 @@ import BuyerBrowseProduce from "./pages/BuyerBrowseProduce";
 import ChatPage from "./pages/ChatPage";
 import BiddingRoom from "./pages/BiddingRoom";
 import BiddingSessions from "./pages/BiddingSessions";
+import Profile from "./pages/Profile";
 function App() {
     return (
             <div>
@@ -27,6 +28,7 @@ function App() {
                 <Route path="/chat" element={<ChatPage />} />
                 <Route path="/bidding/:bidSessionId" element={<BiddingRoom />} />
                 <Route path="/bidding-sessions" element={<BiddingSessions />} />
+                <Route path="/profile" element={<Profile/>}/>
             </Routes>
             
             <Toaster position="top-right"  />
