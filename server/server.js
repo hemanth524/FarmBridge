@@ -86,22 +86,14 @@ io.on("connection", (socket) => {
     console.log(`✅ User ${userId} joined bidding room ${bidSessionId}`);
 
     try {
-        const farmer = await User.findById(userId).select("name _id role");
+        const farmer = await User.findById(userId).select("name _id role avatar");
         if (farmer && farmer.role === "farmer") {
-            const bidSession = await BidSession.findById(bidSessionId);
-
-            const alreadyJoined = bidSession.joinedFarmers.some(joined =>
-                joined.toString() === farmer._id.toString() ||
-                (joined._id && joined._id.toString() === farmer._id.toString())
+            await BidSession.findByIdAndUpdate(
+                bidSessionId,
+                { $addToSet: { joinedFarmers: farmer._id } },
+                { new: true }
             );
-
-            if (!alreadyJoined) {
-                bidSession.joinedFarmers.push(farmer._id);
-                await bidSession.save();
-                console.log(`✅ Farmer ${farmer.name} added to joinedFarmers.`);
-            } else {
-                console.log(`ℹ️ Farmer ${farmer.name} already in joinedFarmers.`);
-            }
+            console.log(`✅ Farmer ${farmer.name} ensured in joinedFarmers (deduplicated).`);
 
             io.to(bidSessionId).emit("farmer_joined", { farmer });
         } else {
@@ -111,6 +103,7 @@ io.on("connection", (socket) => {
         console.error("❌ Error notifying farmer joined:", error.message);
     }
 });
+
 
     socket.on("start_bidding", async (bidSessionId) => {
         try {

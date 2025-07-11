@@ -63,19 +63,17 @@ export const getBidSessionById = async (req, res) => {
     try {
         const session = await BidSession.findById(req.params.id)
             .populate("produce", "name")
-            .populate("buyer", "name")
-            .populate("farmers", "name")
+            .populate("buyer", "name avatar role _id")
+            .populate("farmers", "name avatar role _id")
             .populate("bids.farmer", "name")
-            .populate("highestBid.farmer", "name")
-            .populate("joinedFarmers", "name _id"); // ✅ add this line
-
-        
+            .populate("highestBid.farmer", "name avatar role _id")
+            .populate("joinedFarmers", "name avatar role _id");
 
         if (!session) {
             return res.status(404).json({ message: "Bidding session not found." });
         }
 
-        // Authorization check (keep as is)
+        // Authorization check
         if (
             req.user.role === "farmer" &&
             !session.farmers.some((f) => f._id.toString() === req.user._id.toString())
@@ -89,10 +87,42 @@ export const getBidSessionById = async (req, res) => {
         ) {
             return res.status(403).json({ message: "You are not authorized to view this session." });
         }
-        console.log("Returned session:", JSON.stringify(session, null, 2));
-        res.status(200).json(session);
+
+        // ✅ Construct joinedUsers for frontend
+        const joinedUsers = [
+            {
+                _id: session.buyer._id,
+                name: session.buyer.name,
+                avatar: session.buyer.avatar || "",
+                role: session.buyer.role,
+            },
+            ...session.joinedFarmers.map(farmer => ({
+                _id: farmer._id,
+                name: farmer.name,
+                avatar: farmer.avatar || "",
+                role: farmer.role,
+            }))
+        ];
+
+        res.status(200).json({
+            _id: session._id,
+            buyer: session.buyer,
+            farmers: session.farmers,
+            produce: session.produce,
+            basePrice: session.basePrice,
+            status: session.status,
+            startTime: session.startTime,
+            endTime: session.endTime,
+            bids: session.bids,
+            highestBid: session.highestBid,
+            joinedUsers,
+            createdAt: session.createdAt,
+            updatedAt: session.updatedAt,
+        });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ message: err.message });
     }
 };
+
 

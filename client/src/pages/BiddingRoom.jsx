@@ -9,47 +9,47 @@ import { toast } from "react-hot-toast";
 
 export default function BiddingRoom() {
     const { bidSessionId } = useParams();
-    const { user, backendURL,loading: userLoading } = useContext(AuthContext);
+    const { user, backendURL, loading: userLoading } = useContext(AuthContext);
     const { socket } = useContext(SocketContext);
 
     const [bidSession, setBidSession] = useState(null);
     const [highestBid, setHighestBid] = useState(null);
     const [bidAmount, setBidAmount] = useState("");
-    const [joinedFarmers, setJoinedFarmers] = useState([]);
+    const [joinedUsers, setJoinedUsers] = useState([]);
     const [loading, setLoading] = useState(true);
 
     // Fetch bid session details
-   useEffect(() => {
-    if (!user || userLoading) return; // ✅ wait for user to load
+    useEffect(() => {
+        if (!user || userLoading) return;
 
-    const fetchBidSession = async () => {
-        try {
-            const res = await axios.get(`${backendURL}/bids/${bidSessionId}`, {
-                headers: { Authorization: `Bearer ${user.token}` },
-            });
-            const session = res.data;
-            if (session) {
-                setBidSession(session);
-                setHighestBid(session.highestBid);
-                setJoinedFarmers(session.joinedFarmers || []);
-            } else {
-                toast.error("Bidding session not found.");
+        const fetchBidSession = async () => {
+            try {
+                const res = await axios.get(`${backendURL}/bids/${bidSessionId}`, {
+                    headers: { Authorization: `Bearer ${user.token}` },
+                });
+                const session = res.data;
+                if (session) {
+                    setBidSession(session);
+                    setHighestBid(session.highestBid);
+                    setJoinedUsers(session.joinedUsers || []);
+                } else {
+                    toast.error("Bidding session not found.");
+                }
+            } catch (error) {
+                toast.error("Failed to fetch bidding session.");
+            } finally {
+                setLoading(false);
             }
-        } catch (error) {
-            toast.error("Failed to fetch bidding session.");
-        } finally {
-            setLoading(false);
-        }
-    };
+        };
 
-    fetchBidSession();
-}, [bidSessionId, user, userLoading]);
+        fetchBidSession();
+    }, [bidSessionId, user, userLoading]);
 
     // Join bidding room
     useEffect(() => {
-    if (!socket || !user || !user._id || userLoading) return; // ensure fully loaded
-    socket.emit("join_bidding", bidSessionId, user._id);
-}, [socket, user, userLoading, bidSessionId]);
+        if (!socket || !user || !user._id || userLoading) return;
+        socket.emit("join_bidding", bidSessionId, user._id);
+    }, [socket, user, userLoading, bidSessionId]);
 
     // Handle socket events
     useEffect(() => {
@@ -69,26 +69,22 @@ export default function BiddingRoom() {
             toast.success(data.message);
             setBidSession((prev) => ({ ...prev, status: "completed" }));
         };
-        
-        const handleFarmerJoined = (data) => {
-    setJoinedFarmers((prev) => {
-        const alreadyExists = prev.some((f) => f._id === data.farmer._id);
-        if (alreadyExists) return prev;
-        return [...prev, data.farmer];
-    });
-    toast.success(`${data.farmer.name} joined the bidding.`);
-};
+
+        const handleUserJoined = (data) => {
+            setJoinedUsers(data.joinedUsers);
+            toast.success(`${data.user.name} joined the bidding.`);
+        };
 
         socket.on("bid_update", handleBidUpdate);
         socket.on("bidding_started", handleBiddingStarted);
         socket.on("bidding_ended", handleBiddingEnded);
-        socket.on("farmer_joined", handleFarmerJoined);
+        socket.on("user_joined", handleUserJoined);
 
         return () => {
             socket.off("bid_update", handleBidUpdate);
             socket.off("bidding_started", handleBiddingStarted);
             socket.off("bidding_ended", handleBiddingEnded);
-            socket.off("farmer_joined", handleFarmerJoined);
+            socket.off("user_joined", handleUserJoined);
         };
     }, [socket]);
 
@@ -134,14 +130,14 @@ export default function BiddingRoom() {
                 Bidding Room for {bidSession.produce?.name}
             </h2>
             <p className="text-center">
-                Status:{" "}
+                Status: {" "}
                 <span
                     className={
                         bidSession.status === "active"
                             ? "text-green-600"
                             : bidSession.status === "scheduled"
-                            ? "text-yellow-600"
-                            : "text-gray-600"
+                                ? "text-yellow-600"
+                                : "text-gray-600"
                     }
                 >
                     {bidSession.status.toUpperCase()}
@@ -174,20 +170,51 @@ export default function BiddingRoom() {
                 </div>
             )}
 
-            {user.role === "buyer" && (
-                <div>
-                    <h3 className="text-lg font-semibold mt-4">Farmers Joined:</h3>
-                    {joinedFarmers.length === 0 ? (
-                        <p>No farmers joined yet.</p>
-                    ) : (
-                        <ul className="list-disc list-inside">
-                            {joinedFarmers.map((farmer) => (
-                                <li key={farmer._id}>{farmer.name}</li>
+            {/* User Grid */}
+            <div>
+                <h3 className="text-lg font-semibold mt-4 text-center">Users in Bidding Room</h3>
+                {joinedUsers.length === 0 ? (
+                    <p className="text-center">No users joined yet.</p>
+                ) : (
+                    <div className="grid grid-cols-3 md:grid-cols-4 gap-4 mt-4 justify-items-center">
+                        {/* First row: Buyer */}
+                        {joinedUsers
+                            .filter((u) => u.role === "buyer")
+                            .map((user) => (
+                                <div
+                                    key={user._id}
+                                    className="flex flex-col items-center p-2 border rounded-xl shadow hover:shadow-lg transition"
+                                >
+                                    <img
+                                        src={user.avatar || "/default-avatar.png"}
+                                        alt={user.name}
+                                        className="w-16 h-16 rounded-full object-cover border"
+                                    />
+                                    <p className="mt-2 text-center font-medium">{user.name}</p>
+                                    <p className="text-xs text-gray-500">(Buyer)</p>
+                                </div>
                             ))}
-                        </ul>
-                    )}
-                </div>
-            )}
+
+                        {/* Below: All Farmers */}
+                        {joinedUsers
+                            .filter((u) => u.role === "farmer")
+                            .map((user) => (
+                                <div
+                                    key={user._id}
+                                    className="flex flex-col items-center p-2 border rounded-xl shadow hover:shadow-lg transition"
+                                >
+                                    <img
+                                        src={user.avatar || "/default-avatar.png"}
+                                        alt={user.name}
+                                        className="w-16 h-16 rounded-full object-cover border"
+                                    />
+                                    <p className="mt-2 text-center font-medium">{user.name}</p>
+                                    <p className="text-xs text-gray-500">(Farmer)</p>
+                                </div>
+                            ))}
+                    </div>
+                )}
+            </div>
 
             {user.role === "farmer" && bidSession.status === "active" && (
                 <div className="space-y-2">
