@@ -33,39 +33,23 @@ export const updateInterestedCrops = async (req, res) => {
 export const getProduceForBuyer = async (req, res) => {
     const { crop } = req.query;
     try {
-        const buyer = await User.findById(req.user._id);
-        if (!buyer) return res.status(404).json({ message: "Buyer not found" });
+        const buyerId = req.user._id;
 
-        let filter = {};
-        let query = null;
+        const filter = {
+            buyers: buyerId
+        };
 
         if (crop) {
-            // If a specific crop is selected
             filter.name = crop;
-            query = Produce.find(filter);
-        } else if (buyer.interestedCrops && buyer.interestedCrops.length > 0) {
-            // If buyer has interested crops, show matching
-            filter.name = { $in: buyer.interestedCrops };
-            query = Produce.find(filter);
-        } else {
-            // If no interests and no crop selected, show latest 6 produce
-            query = Produce.find({});
         }
 
-        // Common population
-        query = query
+        const produce = await Produce.find(filter)
             .populate("farmer", "name location email phone")
             .sort({ createdAt: -1 });
 
-        if (!crop && (!buyer.interestedCrops || buyer.interestedCrops.length === 0)) {
-            // Apply limit if showing latest
-            query = query.limit(6);
-        }
-
-        const produce = await query.exec();
-
         res.status(200).json(produce);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error(error);
+        res.status(500).json({ message: error.message || "Server error" });
     }
 };
