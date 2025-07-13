@@ -10,16 +10,14 @@ import ChatPage from "./pages/ChatPage";
 import BiddingRoom from "./pages/BiddingRoom";
 import BiddingSessions from "./pages/BiddingSessions";
 import Profile from "./pages/Profile";
+import HomePage from "./pages/Homepage";
 function App() {
     return (
             <div>
             <Navbar />
             <Routes>
-                <Route path="/" element={
-                    <div className="text-red-300 text-5xl text-center mt-10">
-                        Hello FarmBridge 🚜
-                    </div>
-                } />
+                
+                <Route path="/" element={<HomePage/>}/>
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/add-produce" element={<AddProduce />} />
