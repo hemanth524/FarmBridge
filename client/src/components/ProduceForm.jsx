@@ -59,7 +59,6 @@ export default function ProduceForm({ selectedCrop, selectedBuyers }) {
 
             toast.success("Produce added successfully!", { id: "upload" });
 
-            // ✅ Clear form on success
             setFormData({
                 description: "",
                 quantity: "",
@@ -69,7 +68,6 @@ export default function ProduceForm({ selectedCrop, selectedBuyers }) {
                 images: []
             });
 
-            // Optional: clear file input manually if needed
             document.getElementById("produce-images").value = "";
 
         } catch (err) {
@@ -80,59 +78,87 @@ export default function ProduceForm({ selectedCrop, selectedBuyers }) {
     if (!selectedCrop || selectedBuyers.length === 0) return null;
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white shadow rounded p-4 space-y-4 mt-6">
-            <h3 className="text-lg font-semibold">Add Produce Details for {selectedCrop}</h3>
-            <textarea
-                name="description"
-                placeholder="Description"
-                value={formData.description}
-                onChange={handleChange}
-                className="border p-2 w-full rounded"
-            />
-            <input
-                type="number"
-                name="quantity"
-                placeholder="Quantity"
-                value={formData.quantity}
-                onChange={handleChange}
-                className="border p-2 w-full rounded"
-                required
-            />
-            <input
-                type="number"
-                name="price"
-                placeholder="Price"
-                value={formData.price}
-                onChange={handleChange}
-                className="border p-2 w-full rounded"
-                required
-            />
-            <label className="block">Start Date:</label>
-            <input
-                type="date"
-                name="startDate"
-                value={formData.startDate}
-                onChange={handleChange}
-                className="border p-2 w-full rounded"
-            />
-            <label className="block">End Date:</label>
-            <input
-                type="date"
-                name="endDate"
-                value={formData.endDate}
-                onChange={handleChange}
-                className="border p-2 w-full rounded"
-            />
-            <input
-                type="file"
-                id="produce-images"
-                multiple
-                onChange={handleImageChange}
-                className="border p-2 w-full rounded"
-            />
+        <form onSubmit={handleSubmit} className="bg-white shadow-lg rounded-xl p-6 max-w-2xl mx-auto mt-8 border border-gray-200">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                Add Produce Details for <span className="text-green-700">{selectedCrop}</span>
+            </h2>
+
+            <div className="mb-4">
+                <label className="block font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    placeholder="Enter details about the produce"
+                    className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    rows={4}
+                />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label className="block font-medium text-gray-700 mb-1">Quantity</label>
+                    <input
+                        type="number"
+                        name="quantity"
+                        value={formData.quantity}
+                        onChange={handleChange}
+                        placeholder="e.g. 100 kg"
+                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                        required
+                    />
+                </div>
+                <div>
+                    <label className="block font-medium text-gray-700 mb-1">Price (₹)</label>
+                    <input
+                        type="number"
+                        name="price"
+                        value={formData.price}
+                        onChange={handleChange}
+                        placeholder="e.g. 50 per kg"
+                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                        required
+                    />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label className="block font-medium text-gray-700 mb-1">Start Date</label>
+                    <input
+                        type="date"
+                        name="startDate"
+                        value={formData.startDate}
+                        onChange={handleChange}
+                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                </div>
+                <div>
+                    <label className="block font-medium text-gray-700 mb-1">End Date</label>
+                    <input
+                        type="date"
+                        name="endDate"
+                        value={formData.endDate}
+                        onChange={handleChange}
+                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                </div>
+            </div>
+
+            <div className="mb-6">
+                <label className="block font-medium text-gray-700 mb-2">Upload Images</label>
+                <input
+                    type="file"
+                    id="produce-images"
+                    multiple
+                    onChange={handleImageChange}
+                    className="w-full p-2 border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+            </div>
+
             <button
                 type="submit"
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+                className="w-full bg-green-600 text-white font-semibold py-3 rounded-md hover:bg-green-700 transition duration-300"
             >
                 Submit Produce
             </button>
