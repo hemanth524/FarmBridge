@@ -2,49 +2,60 @@
 
 export default function CropSelector({ crops, selectedCrop, onSelectCrop }) {
     const constantCrops = ["Wheat", "Rice", "Corn", "Barley", "Soybean", "Potato", "Tomato", "other"];
-
-    // Filter out constants from user crops to avoid duplicates
     const extraCrops = crops.filter(crop => !constantCrops.includes(crop));
 
     return (
-        <div className="w-1/4 bg-green-100 p-4 space-y-2">
-            <h2 className="text-lg font-semibold">Select Crop</h2>
+        <aside className="w-full sm:w-1/3 lg:w-1/4 p-6 bg-white shadow-md rounded-2xl border border-gray-200 space-y-4">
+            <h2 className="text-xl font-semibold text-gray-800">Select Crop</h2>
 
             {/* Clear Selection Button */}
             <button
                 onClick={() => onSelectCrop("")}
-                className={`w-full p-2 rounded ${selectedCrop === "" ? "bg-green-600 text-white" : "bg-white hover:bg-green-200"}`}
+                className={`w-full py-2 px-4 rounded-lg font-medium transition-colors duration-200 
+                ${selectedCrop === "" ? "bg-green-600 text-white" : "bg-gray-100 hover:bg-green-200 text-gray-700"}`}
             >
                 Clear Selection
             </button>
 
-            {/* Divider */}
-            <hr className="my-2 border-gray-400" />
+            {/* Constant Crops */}
+            <div>
+                <p className="text-sm text-gray-500 mb-2">Common Crops</p>
+                <div className="grid grid-cols-2 gap-2">
+                    {constantCrops.map(crop => (
+                        <button
+                            key={crop}
+                            onClick={() => onSelectCrop(crop)}
+                            className={`py-2 px-3 rounded-lg text-sm font-medium transition 
+                            ${selectedCrop === crop
+                                ? "bg-green-600 text-white"
+                                : "bg-gray-100 hover:bg-green-100 text-gray-800"}`}
+                        >
+                            {crop}
+                        </button>
+                    ))}
+                </div>
+            </div>
 
-            {/* Constant crops */}
-            {constantCrops.map(crop => (
-                <button
-                    key={crop}
-                    onClick={() => onSelectCrop(crop)}
-                    className={`w-full p-2 rounded ${selectedCrop === crop ? "bg-green-600 text-white" : "bg-white hover:bg-green-200"}`}
-                >
-                    {crop}
-                </button>
-            ))}
-
-            {/* Divider */}
-            {extraCrops.length > 0 && <hr className="my-2 border-gray-400" />}
-
-            {/* Extra user crops */}
-            {extraCrops.map(crop => (
-                <button
-                    key={crop}
-                    onClick={() => onSelectCrop(crop)}
-                    className={`w-full p-2 rounded ${selectedCrop === crop ? "bg-green-600 text-white" : "bg-white hover:bg-green-200"}`}
-                >
-                    {crop}
-                </button>
-            ))}
-        </div>
+            {/* Extra Crops */}
+            {extraCrops.length > 0 && (
+                <div>
+                    <p className="text-sm text-gray-500 mt-4 mb-2">Custom Crops</p>
+                    <div className="grid grid-cols-2 gap-2">
+                        {extraCrops.map(crop => (
+                            <button
+                                key={crop}
+                                onClick={() => onSelectCrop(crop)}
+                                className={`py-2 px-3 rounded-lg text-sm font-medium transition 
+                                ${selectedCrop === crop
+                                    ? "bg-green-600 text-white"
+                                    : "bg-gray-100 hover:bg-green-100 text-gray-800"}`}
+                            >
+                                {crop}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </aside>
     );
 }

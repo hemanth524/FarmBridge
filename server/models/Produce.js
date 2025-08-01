@@ -13,6 +13,19 @@ const produceSchema = new mongoose.Schema(
     },
     images: [{ type: String }],
     buyers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
+    paymentStatus: {
+  type: String,
+  enum: ["pending", "done"],
+  default: "pending",
+},
+paidBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+paidTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+paymentDetails: {
+  razorpayOrderId: String,
+  razorpayPaymentId: String,
+  paymentDate: Date,
+},
+
   },
   { timestamps: true }
 );

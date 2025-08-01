@@ -18,6 +18,16 @@ const bidSessionSchema = new mongoose.Schema({
         time: Date,
     }],
     joinedFarmers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    paymentStatus: {
+  type: String,
+  enum: ["pending", "done"],
+  default: "pending",
+},
+paymentDetails: {
+  paymentId: String,
+  orderId: String,
+  paymentDate: Date,
+},
 }, { timestamps: true });
 
 const BidSession = mongoose.model("BidSession", bidSessionSchema);

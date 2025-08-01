@@ -11,6 +11,8 @@ import BiddingRoom from "./pages/BiddingRoom";
 import BiddingSessions from "./pages/BiddingSessions";
 import Profile from "./pages/Profile";
 import HomePage from "./pages/Homepage";
+import BuyerPayments from "./pages/BuyerPayments";
+import FarmerPayments from "./pages/FarmerPayments";
 function App() {
     return (
             <div>
@@ -27,6 +29,8 @@ function App() {
                 <Route path="/bidding/:bidSessionId" element={<BiddingRoom />} />
                 <Route path="/bidding-sessions" element={<BiddingSessions />} />
                 <Route path="/profile" element={<Profile/>}/>
+                <Route path="/buyer-payments" element={<BuyerPayments />} />
+<Route path="/farmer-payments" element={<FarmerPayments />} />
             </Routes>
             
             <Toaster position="top-right"  />

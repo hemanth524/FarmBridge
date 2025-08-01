@@ -11,7 +11,9 @@ import buyerRoutes from "./routes/buyerRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import bidRoutes from "./routes/bidRoutes.js"; // ✅ Ensure bidRoutes is imported
 
-import BidSession from "./models/BidSession.js"; // Needed for live bidding
+import BidSession from "./models/BidSession.js"; 
+import paymentRoutes from "./routes/paymentRoutes.js";
+
 
 dotenv.config();
 
@@ -37,6 +39,7 @@ app.use("/api/produce", produceRoutes);
 app.use("/api/buyers", buyerRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/bids", bidRoutes); // ✅ Mount bidRoutes
+app.use("/api/payments", paymentRoutes);
 
 // Health check route
 app.get("/", (req, res) => {

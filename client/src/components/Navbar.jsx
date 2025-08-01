@@ -31,6 +31,12 @@ export default function Navbar() {
                             <Link to="/my-produce" className="hover:underline">My Produce</Link>
                         </>
                     )}
+                                        {user?.role === "buyer" && (
+  <Link to="/buyer-payments" className="hover:underline">Payments</Link>
+)}
+{user?.role === "farmer" && (
+  <Link to="/farmer-payments" className="hover:underline">Payments</Link>
+)}
 
                     {user?.role === "buyer" && (
                         <Link to="/browse-produce" className="hover:underline">Browse Produce</Link>
