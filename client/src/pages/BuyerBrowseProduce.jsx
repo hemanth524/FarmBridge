@@ -1,5 +1,3 @@
-// src/pages/BuyerBrowseProduce.jsx
-
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
@@ -55,11 +53,7 @@ export default function BuyerBrowseProduce() {
 
         setSelectedFarmers((prev) => {
             const updated = new Set(prev);
-            if (isSelected) {
-                updated.add(farmerId);
-            } else {
-                updated.delete(farmerId);
-            }
+            isSelected ? updated.add(farmerId) : updated.delete(farmerId);
             return updated;
         });
     };
@@ -95,48 +89,50 @@ export default function BuyerBrowseProduce() {
     };
 
     return (
-        <div className="flex">
-            {/* Left: Crop Selector */}
-            <CropSelector
-                crops={crops}
-                selectedCrop={selectedCrop}
-                onSelectCrop={setSelectedCrop}
-            />
+        <div className="bg-gradient-to-br from-green-100 via-white to-green-200 min-h-screen p-4">
+            <div className="flex flex-col md:flex-row gap-6">
+                {/* Left: Crop Selector */}
 
-            {/* Right: Produce Display */}
-            <div className="w-3/4 p-4">
-                <h2 className="text-2xl font-bold mb-4 text-center">
-                    {selectedCrop ? `Produce for ${selectedCrop}` : "All Produce Matching Your Interests"}
-                </h2>
+                    <CropSelector
+                        crops={crops}
+                        selectedCrop={selectedCrop}
+                        onSelectCrop={setSelectedCrop}
+                    />
+                {/* Right: Produce Display */}
+                <div className="w-full md:w-3/4">
+                    <h2 className="text-2xl font-bold mb-6 text-center text-green-700">
+                        {selectedCrop ? `Produce for ${selectedCrop}` : "All Produce Matching Your Interests"}
+                    </h2>
 
-                {loading ? (
-                    <p className="text-center">Loading produce...</p>
-                ) : produceList.length === 0 ? (
-                    <p className="text-center">No produce found for your interests.</p>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {produceList.map((item) => (
-                            <ProduceCard
-                                key={item._id}
-                                item={item}
-                                showFarmer={true}
-                                selectionMode={true}
-                                onSelect={handleSelectFarmer}
-                            />
-                        ))}
-                    </div>
-                )}
+                    {loading ? (
+                        <p className="text-center text-gray-600 text-lg">Loading produce...</p>
+                    ) : produceList.length === 0 ? (
+                        <p className="text-center text-gray-600 text-lg">No produce found for your interests.</p>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {produceList.map((item) => (
+                                <ProduceCard
+                                    key={item._id}
+                                    item={item}
+                                    showFarmer={true}
+                                    selectionMode={true}
+                                    onSelect={handleSelectFarmer}
+                                />
+                            ))}
+                        </div>
+                    )}
 
-                {selectedFarmers.size > 0 && (
-                    <div className="flex justify-center mt-4">
-                        <button
-                            onClick={handleStartBidding}
-                            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
-                        >
-                            Start Bidding
-                        </button>
-                    </div>
-                )}
+                    {selectedFarmers.size > 0 && (
+                        <div className="flex justify-center mt-8">
+                            <button
+                                onClick={handleStartBidding}
+                                className="bg-green-600 hover:bg-green-700 text-white text-lg font-medium px-8 py-3 rounded-lg shadow-md transition-all duration-200"
+                            >
+                                Start Bidding
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

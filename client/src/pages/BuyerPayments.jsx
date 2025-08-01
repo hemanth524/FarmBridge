@@ -1,4 +1,3 @@
-// src/pages/BuyerPayments.js
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -14,9 +13,9 @@ export default function BuyerPayments() {
       .then((res) => res.json())
       .then((data) => setProduceList(data))
       .catch((err) => {
-  console.error("❌ BuyerPayments fetch error:", err);
-  toast.error("Failed to load your purchases");
-});
+        console.error("❌ BuyerPayments fetch error:", err);
+        toast.error("Failed to load your purchases");
+      });
   }, []);
 
   const openRazorpay = (produceId, amount) => {
@@ -31,7 +30,7 @@ export default function BuyerPayments() {
       .then((res) => res.json())
       .then((order) => {
         const options = {
-          key: "rzp_test_Z7kaXVsXt5WI6j", // ✅ use actual Razorpay key
+          key: "rzp_test_Z7kaXVsXt5WI6j",
           amount: order.amount,
           currency: "INR",
           order_id: order.id,
@@ -50,7 +49,8 @@ export default function BuyerPayments() {
               }),
             });
             toast.success("Payment successful");
-            // refresh data
+
+            // Refresh data
             const updated = await fetch("http://localhost:5247/api/payments/buyer", {
               headers: { Authorization: `Bearer ${token}` },
             }).then((res) => res.json());
@@ -68,40 +68,57 @@ export default function BuyerPayments() {
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-semibold mb-4">Buyer Payments</h2>
-      {produceList.length === 0 ? (
-        <p>No purchased produce found.</p>
-      ) : (
-        <ul className="space-y-4">
-          {produceList.map((produce) => (
-            <li
-              key={produce._id}
-              className="border p-4 rounded shadow bg-white space-y-1"
-            >
-              <div><strong>Crop:</strong> {produce.name}</div>
-              <div><strong>Farmer:</strong> {produce.farmer?.name}</div>
-              <div><strong>Amount:</strong> ₹{produce.price}</div>
-              <div>
-                <strong>Status:</strong>{" "}
-                {produce.paymentStatus === "done" ? (
-                  <span className="text-green-600">Done</span>
-                ) : (
-                  <span className="text-yellow-600">Pending</span>
-                )}
-              </div>
-              {produce.paymentStatus === "pending" && (
-                <button
-                  onClick={() => openRazorpay(produce._id, produce.price)}
-                  className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                >
-                  Pay Now
-                </button>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">
+          Buyer Payments
+        </h2>
+
+        {produceList.length === 0 ? (
+          <div className="flex justify-center items-center h-[60vh] text-gray-600 text-lg">
+            <p>No purchased produce found.</p>
+          </div>
+        ) : (
+          <ul className="space-y-6">
+            {produceList.map((produce) => (
+              <li
+                key={produce._id}
+                className="bg-white rounded-2xl p-6 shadow-md border border-gray-200"
+              >
+                <div className="text-gray-800">
+                  <div className="mb-1">
+                    <span className="font-medium">Crop:</span> {produce.name}
+                  </div>
+                  <div className="mb-1">
+                    <span className="font-medium">Farmer:</span>{" "}
+                    {produce.farmer?.name}
+                  </div>
+                  <div className="mb-1">
+                    <span className="font-medium">Amount:</span> ₹{produce.price}
+                  </div>
+                  <div className="mb-1">
+                    <span className="font-medium">Status:</span>{" "}
+                    {produce.paymentStatus === "done" ? (
+                      <span className="text-green-600 font-semibold">Done</span>
+                    ) : (
+                      <span className="text-yellow-600 font-semibold">Pending</span>
+                    )}
+                  </div>
+
+                  {produce.paymentStatus === "pending" && (
+                    <button
+                      onClick={() => openRazorpay(produce._id, produce.price)}
+                      className="mt-4 px-5 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition"
+                    >
+                      Pay Now
+                    </button>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }

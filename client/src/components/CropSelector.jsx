@@ -5,10 +5,9 @@ export default function CropSelector({ crops, selectedCrop, onSelectCrop }) {
     const extraCrops = crops.filter(crop => !constantCrops.includes(crop));
 
     return (
-        <aside className="w-full sm:w-1/3 lg:w-1/4 p-6 bg-white shadow-md rounded-2xl border border-gray-200 space-y-4">
-            <h2 className="text-xl font-semibold text-gray-800">Select Crop</h2>
+        <aside className="w-full sm:w-1/3 lg:w-1/4 p-6 bg-gradient-to-br from-gray-900 via-gray-500  to-gray-300 shadow-md rounded-2xl border border-gray-200 space-y-4">
+            <h2 className="text-xl font-semibold text-white">Select Crop</h2>
 
-            {/* Clear Selection Button */}
             <button
                 onClick={() => onSelectCrop("")}
                 className={`w-full py-2 px-4 rounded-lg font-medium transition-colors duration-200 
@@ -19,7 +18,7 @@ export default function CropSelector({ crops, selectedCrop, onSelectCrop }) {
 
             {/* Constant Crops */}
             <div>
-                <p className="text-sm text-gray-500 mb-2">Common Crops</p>
+                <p className="text-sm text-white mb-2">Common Crops</p>
                 <div className="grid grid-cols-2 gap-2">
                     {constantCrops.map(crop => (
                         <button

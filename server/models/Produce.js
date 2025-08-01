@@ -25,6 +25,12 @@ paymentDetails: {
   razorpayPaymentId: String,
   paymentDate: Date,
 },
+biddingStatus: {
+  type: String,
+  enum: ["not_started", "ongoing", "completed"],
+  default: "not_started",
+},
+
 
   },
   { timestamps: true }

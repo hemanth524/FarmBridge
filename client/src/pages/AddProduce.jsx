@@ -9,7 +9,7 @@ export default function AddProduce() {
     const [selectedBuyers, setSelectedBuyers] = useState([]);
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
+        <div className="flex min-h-screen   bg-gray-200">
             <CropSelector
                 crops={crops}
                 selectedCrop={selectedCrop}

@@ -9,7 +9,7 @@ import authRoutes from "./routes/authRoutes.js";
 import produceRoutes from "./routes/produceRoutes.js";
 import buyerRoutes from "./routes/buyerRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
-import bidRoutes from "./routes/bidRoutes.js"; // ✅ Ensure bidRoutes is imported
+import bidRoutes from "./routes/bidRoutes.js"; 
 
 import BidSession from "./models/BidSession.js"; 
 import paymentRoutes from "./routes/paymentRoutes.js";
@@ -109,27 +109,37 @@ io.on("connection", (socket) => {
 
 
     socket.on("start_bidding", async (bidSessionId) => {
-        try {
-            const bidSession = await BidSession.findById(bidSessionId).populate("produce buyer farmers");
-            if (!bidSession) {
-                console.error("❌ Bid session not found:", bidSessionId);
-                return;
-            }
-            bidSession.status = "active";
-            await bidSession.save();
-
-            io.to(bidSessionId).emit("bidding_started", {
-                message: `Bidding for ${bidSession.produce.name} has started!`,
-                bidSessionId,
-                basePrice: bidSession.basePrice,
-                produce: bidSession.produce,
-            });
-
-            console.log(`🚀 Bidding started for session ${bidSessionId}`);
-        } catch (error) {
-            console.error("❌ Error starting bidding:", error.message);
+    try {
+        const bidSession = await BidSession.findById(bidSessionId).populate("produce buyer farmers");
+        if (!bidSession) {
+            console.error("❌ Bid session not found:", bidSessionId);
+            return;
         }
-    });
+
+        // Set bidSession status to active
+        bidSession.status = "active";
+        await bidSession.save();
+
+        // Set produce biddingStatus to 'ongoing'
+        if (bidSession.produce) {
+            bidSession.produce.biddingStatus = "ongoing";
+            await bidSession.produce.save();
+            console.log(`🚨 Produce ${bidSession.produce._id} status updated to 'ongoing'`);
+        }
+
+        io.to(bidSessionId).emit("bidding_started", {
+            message: `Bidding for ${bidSession.produce.name} has started!`,
+            bidSessionId,
+            basePrice: bidSession.basePrice,
+            produce: bidSession.produce,
+        });
+
+        console.log(`🚀 Bidding started for session ${bidSessionId}`);
+    } catch (error) {
+        console.error("❌ Error starting bidding:", error.message);
+    }
+});
+
 
     socket.on("place_bid", async ({ bidSessionId, farmerId, amount }) => {
         try {
@@ -164,39 +174,46 @@ io.on("connection", (socket) => {
     });
 
     socket.on("end_bidding", async (bidSessionId) => {
-        try {
-            const bidSession = await BidSession.findById(bidSessionId);
-            if (!bidSession) {
-                console.error("❌ Bid session not found for ending:", bidSessionId);
-                return;
-            }
-            bidSession.status = "completed";
-            bidSession.endTime = new Date();
-            await bidSession.save();
-
-            io.to(bidSessionId).emit("bidding_ended", {
-                message: `Bidding has ended.`,
-                bidSessionId,
-                highestBid: bidSession.highestBid,
-            });
-
-            console.log(`✅ Bidding ended for session ${bidSessionId}`);
-        } catch (error) {
-            console.error("❌ Error ending bidding:", error.message);
+    try {
+        const bidSession = await BidSession.findById(bidSessionId).populate("produce");
+        if (!bidSession) {
+            console.error("❌ Bid session not found for ending:", bidSessionId);
+            return;
         }
-    });
 
-    // ==================== END BIDDING SOCKET HANDLERS ====================
+        // Mark bid session as completed
+        bidSession.status = "completed";
+        bidSession.endTime = new Date();
+        await bidSession.save();
+
+        // Mark the produce as completed
+        if (bidSession.produce) {
+            bidSession.produce.biddingStatus = "completed";
+            await bidSession.produce.save();
+            console.log(`✅ Produce ${bidSession.produce._id} status updated to 'completed'`);
+        }
+
+        io.to(bidSessionId).emit("bidding_ended", {
+            message: `Bidding has ended.`,
+            bidSessionId,
+            highestBid: bidSession.highestBid,
+        });
+
+        console.log(`✅ Bidding ended for session ${bidSessionId}`);
+    } catch (error) {
+        console.error("❌ Error ending bidding:", error.message);
+    }
+});
+
+
 
     socket.on("disconnect", () => {
         console.log("❌ Socket disconnected:", socket.id);
     });
 });
 
-// Attach io to req.io if needed for controllers
-
-
-// Start server
 server.listen(PORT, () =>
     console.log(`🚀 Server running on http://localhost:${PORT}`)
 );
+
+

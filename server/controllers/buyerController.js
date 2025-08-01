@@ -31,25 +31,32 @@ export const updateInterestedCrops = async (req, res) => {
 };
 
 export const getProduceForBuyer = async (req, res) => {
-    const { crop } = req.query;
-    try {
-        const buyerId = req.user._id;
+  const { crop } = req.query;
+  try {
+    const buyerId = req.user._id;
 
-        const filter = {
-            buyers: buyerId
-        };
+    const filter = {
+      buyers: buyerId,
+      biddingStatus: "not_started", // only available for bidding
+      $or: [
+        { paymentStatus: { $ne: "done" } },
+        { paidBy: { $exists: false } }
+      ]
+    };
 
-        if (crop) {
-            filter.name = crop;
-        }
-
-        const produce = await Produce.find(filter)
-            .populate("farmer", "name location email phone")
-            .sort({ createdAt: -1 });
-
-        res.status(200).json(produce);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: error.message || "Server error" });
+    if (crop) {
+      filter.name = crop;
     }
+
+    const produce = await Produce.find(filter)
+      .populate("farmer", "name location email phone")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(produce);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message || "Server error" });
+  }
 };
+
+

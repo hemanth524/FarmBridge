@@ -1,18 +1,44 @@
-// src/components/ProduceCard.jsx
-
 import { useState } from "react";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 export default function ProduceCard({
     item,
     showFarmer = false,
     selectionMode = false,
     onSelect = () => {},
+    onDelete = () => {},
 }) {
     const [isSelected, setIsSelected] = useState(false);
+    const { backendURL, user } = useContext(AuthContext);
 
     const handleSelect = () => {
         setIsSelected(!isSelected);
         onSelect(item.farmer._id, !isSelected);
+    };
+
+    const isExpired =
+        item.availabilityWindow?.endDate &&
+        new Date(item.availabilityWindow.endDate) < new Date();
+
+    const isOwner = user?._id === item.farmer?._id;
+
+    const handleDelete = async () => {
+        if (!window.confirm("Are you sure you want to delete this produce?")) return;
+
+        try {
+            await axios.delete(`${backendURL}/produce/${item._id}`, {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+            });
+            toast.success("Produce deleted");
+            onDelete(item._id); // trigger a refetch or UI update
+        } catch (err) {
+            toast.error("Failed to delete produce");
+        }
     };
 
     return (
@@ -28,7 +54,7 @@ export default function ProduceCard({
                         checked={isSelected}
                         onChange={handleSelect}
                         className="mb-2 accent-green-600"
-                    />{" "}
+                    />
                     <span className="text-sm text-gray-700">Select for bidding</span>
                 </div>
             )}
@@ -37,6 +63,7 @@ export default function ProduceCard({
             <p>{item.description || "No description provided."}</p>
             <p>Quantity: {item.quantity}</p>
             <p>Price: ₹{item.price}</p>
+
             {item.availabilityWindow?.startDate && (
                 <p>
                     Available:{" "}
@@ -44,7 +71,8 @@ export default function ProduceCard({
                     {new Date(item.availabilityWindow.endDate).toLocaleDateString()}
                 </p>
             )}
-            {item.images && item.images.length > 0 && (
+
+            {item.images?.length > 0 && (
                 <div className="flex gap-2 overflow-x-auto">
                     {item.images.map((img, idx) => (
                         <img
@@ -56,6 +84,7 @@ export default function ProduceCard({
                     ))}
                 </div>
             )}
+
             {showFarmer && item.farmer && (
                 <div className="mt-2 text-sm text-gray-700">
                     <p>👨‍🌾 <b>Farmer:</b> {item.farmer.name}</p>
@@ -63,6 +92,16 @@ export default function ProduceCard({
                     <p>📧 {item.farmer.email}</p>
                     <p>📞 {item.farmer.phone || "N/A"}</p>
                 </div>
+            )}
+
+            {/* ✅ Delete button shown only if expired and owned by current user */}
+            {isExpired && (
+                <button
+                    onClick={handleDelete}
+                    className="mt-2 px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                    Delete Expired Produce
+                </button>
             )}
         </div>
     );
